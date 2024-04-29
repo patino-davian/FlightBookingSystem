@@ -1,48 +1,30 @@
 import { Time } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http'
+import { FlightService } from '../api/services/flight.service';
+import { FlightRm } from '../api/models'
 
 @Component({
   selector: 'app-search-flights',
   templateUrl: './search-flights.component.html',
   styleUrls: ['./search-flights.component.css']
 })
-export class SearchFlightsComponent {
+export class SearchFlightsComponent implements OnInit {
 
-  searchResult: FlightRm[] = [
-    {
-      airline: "American Airlines",
-      remainingNumberOfSeats: 500,
-      arrival: { time: Date.now().toString(), place: "Istanbul" },
-      departure: { time: Date.now().toString(), place: "Los Angeles" },
-      price: "350"
-    },
-    {
-      airline: "Delta",
-      remainingNumberOfSeats: 60,
-      arrival: { time: Date.now().toString(), place: "Las Vegas" },
-      departure: { time: Date.now().toString(), place: "San Antonio" },
-      price: "350"
-    },
-    {
-      airline: "Frontier",
-      remainingNumberOfSeats: 500,
-      arrival: { time: Date.now().toString(), place: "San Diego" },
-      departure: { time: Date.now().toString(), place: "New York" },
-      price: "650"
-    }
-  ]
+  searchResult: FlightRm[] = [];
 
-}
+  constructor(private flightService: FlightService) { }
 
-export interface FlightRm {
-  airline: string;
-  arrival: TimePlaceRm;
-  departure: TimePlaceRm;
-  price: string;
-  remainingNumberOfSeats: number;
-}
+  ngOnInit() {
 
-export interface TimePlaceRm {
-  place: string;
-  time: string;
+  }
+
+  search() {
+    this.flightService.searchFlight({}).subscribe(request => this.searchResult = request, this.handleError)
+  }
+
+  private handleError(err: any) {
+    console.log(err)
+  }
+
 }

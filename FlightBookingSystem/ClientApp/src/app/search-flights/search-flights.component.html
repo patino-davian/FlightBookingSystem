@@ -58,7 +58,7 @@
           Passengers
         </div>
 
-        <button type="submit" class="btn-primary btn">
+        <button type="submit" class="btn-primary btn" (click)="search()">
           <i class="fas fa-search"></i>
         </button>
 
@@ -91,16 +91,16 @@
 
             <div class="col">
               <i class="fas fa-location-dot">
-                {{flight.departure.place}}
+                {{flight.departure?.place}}
               </i>
             </div>
             <div class="col m-2">
               <i class="fas fa-regular"></i>
-              {{flight.departure.time | date}}
+              {{flight.departure?.time | date}}
             </div>
             <div class="col">
               <i class="fa-regular fa-clock"></i>
-              {{flight.departure.time | date: 'shortTime'}}
+              {{flight.departure?.time | date: 'shortTime'}}
             </div>
 
           </div>
@@ -117,7 +117,7 @@
 
             <i class="fas fa-usd"> {{ flight.price }} </i>
             <br />
-            <a class="btn btn-primary btn-lg mt-2">
+            <a [routerLink]="['/book-flight', flight.id]" class="btn btn-primary btn-lg mt-2">
               <i class="fas fa-ticket"></i>
               Book your flight!
             </a>
@@ -131,16 +131,16 @@
 
             <div class="col">
               <i class="fas fa-location-dot">
-                {{flight.arrival.place}}
+                {{flight.arrival?.place}}
               </i>
             </div>
             <div class="col m-2">
               <i class="fas fa-regular"></i>
-              {{flight.arrival.time | date}}
+              {{flight.arrival?.time | date}}
             </div>
             <div class="col">
               <i class="fa-regular fa-clock"></i>
-              {{flight.arrival.time | date: 'shortTime'}}
+              {{flight.arrival?.time | date: 'shortTime'}}
             </div>
           </div>
 
