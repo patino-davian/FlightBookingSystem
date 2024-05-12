@@ -1,6 +1,7 @@
 ﻿using FlightBookingSystem.DataTransferObjs;
 using FlightBookingSystem.ReadModels;
 using Microsoft.AspNetCore.Mvc;
+using FlightBookingSystem.Domain.Entities;
 
 namespace FlightBookingSystem.Controllers
 {
@@ -13,68 +14,68 @@ namespace FlightBookingSystem.Controllers
 
         static Random random = new Random();
 
-        static private FlightRm[] flights = new FlightRm[]
+        static private Flight[] flights = new Flight[]
         {
              new (
                 Guid.NewGuid(),
                 "American Airlines",
                 random.Next(90, 600).ToString(),
-                new TimePlaceRm("Los Angeles", DateTime.Now.AddHours(random.Next(1,3))),
-                new TimePlaceRm("San Antonio", DateTime.Now.AddHours(random.Next(4,10))),
+                new TimePlace("Los Angeles", DateTime.Now.AddHours(random.Next(1,3))),
+                new TimePlace("San Antonio", DateTime.Now.AddHours(random.Next(4,10))),
                 random.Next(1, 100)),
             new (
                 Guid.NewGuid(),
                 "Delta Airlines",
                 random.Next(90, 700).ToString(),
-                new TimePlaceRm("Chicago", DateTime.Now.AddHours(random.Next(1,10))),
-                new TimePlaceRm("Dallas", DateTime.Now.AddHours(random.Next(4,24))),
+                new TimePlace("Chicago", DateTime.Now.AddHours(random.Next(1,10))),
+                new TimePlace("Dallas", DateTime.Now.AddHours(random.Next(4,24))),
                 random.Next(1, 100)),
 
             new (
                 Guid.NewGuid(),
                 "United Airlines",
                 random.Next(90, 500).ToString(),
-                new TimePlaceRm("New York", DateTime.Now.AddHours(random.Next(1,12))),
-                new TimePlaceRm("Miami", DateTime.Now.AddHours(random.Next(4,10))),
+                new TimePlace("New York", DateTime.Now.AddHours(random.Next(1,12))),
+                new TimePlace("Miami", DateTime.Now.AddHours(random.Next(4,10))),
                 random.Next(1, 100)),
             new (
                 Guid.NewGuid(),
                 "Southwest Airlines",
                 random.Next(90, 700).ToString(),
-                new TimePlaceRm("Houston", DateTime.Now.AddHours(random.Next(1,12))),
-                new TimePlaceRm("Denver", DateTime.Now.AddHours(random.Next(12,24))),
+                new TimePlace("Houston", DateTime.Now.AddHours(random.Next(1,12))),
+                new TimePlace("Denver", DateTime.Now.AddHours(random.Next(12,24))),
                 random.Next(1, 100)),
 
             new (
                 Guid.NewGuid(),
                 "JetBlue Airways",
                 random.Next(90, 500).ToString(),
-                new TimePlaceRm("Orlando", DateTime.Now.AddHours(random.Next(1,3))),
-                new TimePlaceRm("Seattle", DateTime.Now.AddHours(random.Next(4,10))),
+                new TimePlace("Orlando", DateTime.Now.AddHours(random.Next(1,3))),
+                new TimePlace("Seattle", DateTime.Now.AddHours(random.Next(4,10))),
                 random.Next(1, 100)),
 
             new (
                 Guid.NewGuid(),
                 "Alaska Airlines",
                 random.Next(90, 500).ToString(),
-                new TimePlaceRm("Portland", DateTime.Now.AddHours(random.Next(1,3))),
-                new TimePlaceRm("Las Vegas", DateTime.Now.AddHours(random.Next(4,10))),
+                new TimePlace("Portland", DateTime.Now.AddHours(random.Next(1,3))),
+                new TimePlace("Las Vegas", DateTime.Now.AddHours(random.Next(4,10))),
                 random.Next(1, 100)),
 
             new (
                 Guid.NewGuid(),
                 "Spirit Airlines",
                 random.Next(90, 500).ToString(),
-                new TimePlaceRm("Atlanta", DateTime.Now.AddHours(random.Next(1,3))),
-                new TimePlaceRm("Boston", DateTime.Now.AddHours(random.Next(4,10))),
+                new TimePlace("Atlanta", DateTime.Now.AddHours(random.Next(1,3))),
+                new TimePlace("Boston", DateTime.Now.AddHours(random.Next(4,10))),
                 random.Next(1, 100)),
 
             new (
                 Guid.NewGuid(),
                 "Frontier Airlines",
                 random.Next(90, 500).ToString(),
-                new TimePlaceRm("Phoenix", DateTime.Now.AddHours(random.Next(1,3))),
-                new TimePlaceRm("Detroit", DateTime.Now.AddHours(random.Next(12,24))),
+                new TimePlace("Phoenix", DateTime.Now.AddHours(random.Next(1,3))),
+                new TimePlace("Detroit", DateTime.Now.AddHours(random.Next(12,24))),
                 random.Next(1, 100))
         };
 
@@ -89,7 +90,19 @@ namespace FlightBookingSystem.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [ProducesResponseType(typeof(IEnumerable<FlightRm>), 200)]
-        public IEnumerable<FlightRm> Search() => flights;
+        public IEnumerable<FlightRm> Search()
+        {
+            var flightRmList = flights.Select(flight => new FlightRm(
+                flight.Id,
+                flight.Airline,
+                flight.Price,
+                new TimePlaceRm(flight.Departure.Place.ToString(), flight.Departure.Time),
+                new TimePlaceRm(flight.Arrival.Place.ToString(), flight.Arrival.Time),
+                flight.RemainingNumberOfSeats
+                )).ToArray();
+
+            return flightRmList;
+        }
 
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(400)]
@@ -105,7 +118,16 @@ namespace FlightBookingSystem.Controllers
                 return NotFound();
             }
 
-            return Ok(flight);
+            var flightReadModel = new FlightRm(
+                flight.Id,
+                flight.Airline,
+                flight.Price,
+                new TimePlaceRm(flight.Departure.Place.ToString(), flight.Departure.Time),
+                new TimePlaceRm(flight.Arrival.Place.ToString(), flight.Arrival.Time),
+                flight.RemainingNumberOfSeats
+                );
+
+            return Ok(flightReadModel);
         }
 
         [HttpPost]

@@ -72,4 +72,8 @@ export class BookFlightComponent implements OnInit {
     this.flightService.bookFlight({ body: booking }).subscribe(_ => this.router.navigate(['/my-booking-list']), this.handleError);
   }
 
+  get number() {
+    return this.form.controls.number
+  }
+
 }

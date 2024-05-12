@@ -85,8 +85,14 @@
 
 </div>
 
-<div *ngIf="form.controls.number.invalid" class="invalid-feedback d-block">
-    <div>
-        Number of seats is invalid
+<div *ngIf="number.invalid && (number.dirty || number.touched)" class="invalid-feedback d-block">
+    <div *ngIf="number.errors?.['required']">
+        Number of passengers required
+    </div>
+    <div *ngIf="number.errors?.['min']">
+        Minimum of 1 passenger required
+    </div>
+    <div *ngIf="number.errors?.['max']">
+        You cannot book more than 244 seats.
     </div>
 </div>

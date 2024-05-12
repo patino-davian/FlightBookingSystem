@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PassengerService } from '../api/services/passenger.service';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router'
 
@@ -20,10 +20,10 @@ export class RegisterPassengerComponent implements OnInit {
   }
 
   form = this.formBuilder.group({
-    email: [''],
-    firstName: [''],
-    lastName: [''],
-    isFemale: [true]
+    email: ['', Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(35)])],
+    firstName: ['', Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(20)])],
+    lastName: ['', Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(20)])],
+    isFemale: [true, Validators.required]
   })
 
   ngOnInit(): void {
@@ -42,6 +42,11 @@ export class RegisterPassengerComponent implements OnInit {
   }
 
   register() {
+
+    if (this.form.invalid) {
+      return;
+    }
+
     console.log("form values:", this.form.value)
 
     this.passengerService.registerPassenger({ body: this.form.value }).subscribe(this.login, console.error);
