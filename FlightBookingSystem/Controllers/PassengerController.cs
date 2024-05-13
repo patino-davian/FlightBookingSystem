@@ -18,12 +18,14 @@ namespace FlightBookingSystem.Controllers
         [ProducesResponseType(500)]
         public IActionResult Register(NewPassengerDto dto)
         {
-            Passengers.Add(new Passenger(
+            var passenger = new Passenger(
                 dto.Email,
                 dto.FirstName,
                 dto.LastName,
                 dto.Gender
-                ));
+                );
+
+            Passengers.Add(passenger);
             System.Diagnostics.Debug.WriteLine(Passengers.Count); 
             return CreatedAtAction(nameof(Find), new { email = dto.Email });
         }

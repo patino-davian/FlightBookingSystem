@@ -145,6 +145,11 @@ namespace FlightBookingSystem.Controllers
                 return NotFound();
             }
 
+            if (flight.RemainingNumberOfSeats < bookDto.NumberOfSeats)
+            {
+                return Conflict(new { message = "The number of requested seats exceeds the number of remaining seats" });
+            }
+
             var booking = new Booking(
                 bookDto.FlightId,
                 bookDto.PassengerEmail,
@@ -152,6 +157,8 @@ namespace FlightBookingSystem.Controllers
                 );
 
             flight.Bookings.Add(booking);
+
+            flight.RemainingNumberOfSeats -= bookDto.NumberOfSeats;
 
             return CreatedAtAction(nameof(Find), new {id = bookDto.FlightId});
         }
