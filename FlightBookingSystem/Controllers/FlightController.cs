@@ -87,6 +87,8 @@ namespace FlightBookingSystem.Controllers
                 return Conflict(new {message = "The number of seats requested is more than the number of seats available"});
             }
 
+            _entities.SaveChanges();
+
             return CreatedAtAction(nameof(Find), new {id = bookDto.FlightId});
         }
 

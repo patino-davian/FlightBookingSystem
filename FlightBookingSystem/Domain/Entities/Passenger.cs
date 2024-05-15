@@ -6,3 +6,4 @@
         string LastName,
         bool Gender);
 }
+
