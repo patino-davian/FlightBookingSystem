@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using FlightBookingSystem.Domain.Entities;
 using FlightBookingSystem.Domain.Errors;
 using FlightBookingSystem.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace FlightBookingSystem.Controllers
 {
@@ -39,11 +40,11 @@ namespace FlightBookingSystem.Controllers
             return flightRmList;
         }
 
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [ProducesResponseType(typeof(FlightRm), 200)]
-        [HttpGet("{id}")]
         public ActionResult<FlightRm> Find(Guid id)
         {
             var flight = _entities.Flights.SingleOrDefault(f => f.Id == id);
@@ -73,9 +74,9 @@ namespace FlightBookingSystem.Controllers
 
         public IActionResult Book(BookDto bookDto)
         {
-            System.Diagnostics.Debug.WriteLine( $"Booking a new flight {bookDto.FlightId}");
+            System.Diagnostics.Debug.WriteLine($"Booking a new flight {bookDto.FlightId}");
 
-            var flight = _entities.Flights.SingleOrDefault(f => f.Id == bookDto.FlightId );
+            var flight = _entities.Flights.SingleOrDefault(f => f.Id == bookDto.FlightId);
 
             if (flight == null)
                 return NotFound();
@@ -84,12 +85,21 @@ namespace FlightBookingSystem.Controllers
 
             if (error is OverbookError)
             {
-                return Conflict(new {message = "The number of seats requested is more than the number of seats available"});
+                return Conflict(new { message = "The number of seats requested is more than the number of seats available" });
             }
 
-            _entities.SaveChanges();
+            try
+            {
+                _entities.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException exception)
+            {
 
-            return CreatedAtAction(nameof(Find), new {id = bookDto.FlightId});
+                return Conflict(new { message = "An error occured while booking!" });
+            }
+
+
+            return CreatedAtAction(nameof(Find), new { id = bookDto.FlightId });
         }
 
     }

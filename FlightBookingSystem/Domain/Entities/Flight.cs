@@ -1,6 +1,7 @@
 ﻿using FlightBookingSystem.DataTransferObjs;
 using FlightBookingSystem.Domain.Errors;
 using FlightBookingSystem.ReadModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FlightBookingSystem.Domain.Entities
 {
@@ -45,6 +46,21 @@ namespace FlightBookingSystem.Domain.Entities
             flight.Bookings.Add(booking);
 
             flight.RemainingNumberOfSeats -= numberOfSeats;
+            return null;
+        }
+
+        internal object? CancelBooking(string passengerEmail, byte numberOfSeats)
+        {
+            var booking = Bookings.FirstOrDefault( b =>  b.NumberOfSeats == numberOfSeats && passengerEmail.ToLower() == b.PassengerEmail.ToLower());
+
+            if (booking == null)
+            {
+                return new NotFoundError();
+            }
+
+            Bookings.Remove(booking);
+
+            RemainingNumberOfSeats += booking.NumberOfSeats;
             return null;
         }
     }
