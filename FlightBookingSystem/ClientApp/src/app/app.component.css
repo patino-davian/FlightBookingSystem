@@ -1,7 +1,8 @@
 .header {
-  background-image: url('/assets/images/plane.jpg');
+  background-image: url('/assets/images/plane-flying.gif');
   height: 337px;
   background-size: cover;
+  background-position: center;
 }
 
 .footer {
