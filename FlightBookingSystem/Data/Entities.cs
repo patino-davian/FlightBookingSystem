@@ -22,6 +22,9 @@ namespace FlightBookingSystem.Data
 
             modelBuilder.Entity<Flight>().OwnsOne(flight => flight.Departure);
             modelBuilder.Entity<Flight>().OwnsOne(flight => flight.Arrival);
+
+            modelBuilder.Entity<Flight>().OwnsMany(flight => flight.Bookings);
+
         }
     }
 }

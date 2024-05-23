@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { AuthGuard } from '../app/auth/auth.guard';
 
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
@@ -27,10 +28,10 @@ import { MyBookingListComponent } from './my-booking-list/my-booking-list.compon
     ReactiveFormsModule,
     RouterModule.forRoot([
       { path: '', component: SearchFlightsComponent, pathMatch: 'full' },
-      { path: 'search-flights', component: SearchFlightsComponent},
-      { path: 'book-flight/:flightId', component: BookFlightComponent },
+      { path: 'search-flights', component: SearchFlightsComponent },
+      { path: 'book-flight/:flightId', component: BookFlightComponent, canActivate: [AuthGuard] },
       { path: 'register-passenger', component: RegisterPassengerComponent },
-      { path: 'my-booking-list', component: MyBookingListComponent }
+      { path: 'my-booking-list', component: MyBookingListComponent, canActivate: [AuthGuard] }
     ])
   ],
   providers: [],

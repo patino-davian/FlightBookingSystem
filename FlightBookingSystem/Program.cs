@@ -7,9 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add DBcontext
 
 builder.Services.AddDbContext<Entities>(options =>
-
-    options.UseInMemoryDatabase(databaseName: "Flights"),
-    ServiceLifetime.Singleton
+    options.UseSqlServer(builder.Configuration.GetConnectionString("FlightBookingSystem"))
 );
 
 // Add services to the container.
@@ -26,7 +24,7 @@ builder.Services.AddSwaggerGen( c =>
     c.CustomOperationIds(e => $"{e.ActionDescriptor.RouteValues["action"] + e.ActionDescriptor.RouteValues["controller"]}");
 });
 
-builder.Services.AddSingleton<Entities>();
+builder.Services.AddScoped<Entities>();
 
 // Build the app
 
@@ -36,10 +34,14 @@ var app = builder.Build();
 
 var entities = app.Services.CreateScope().ServiceProvider.GetService<Entities>();
 
+entities.Database.EnsureCreated();
+
 var random = new Random();
 
-Flight[] flightsToSeed = new Flight[]
+if (!entities.Flights.Any())
 {
+    Flight[] flightsToSeed = new Flight[]
+    {
     new (
                 Guid.NewGuid(),
                 "American Airlines",
@@ -101,10 +103,10 @@ Flight[] flightsToSeed = new Flight[]
                 new TimePlace("Phoenix", DateTime.Now.AddHours(random.Next(1,3))),
                 new TimePlace("Detroit", DateTime.Now.AddHours(random.Next(12,24))),
                 random.Next(1, 100))
-};
-entities.Flights.AddRange(flightsToSeed);
-
-entities.SaveChanges();
+    };
+    entities.Flights.AddRange(flightsToSeed);
+    entities.SaveChanges();
+}
 
 
 app.UseCors(builder => builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader());

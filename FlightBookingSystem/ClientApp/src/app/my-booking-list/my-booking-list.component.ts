@@ -22,10 +22,6 @@ export class MyBookingListComponent implements OnInit {
 
   ngOnInit(): void {
 
-    if (!this.authService.currentUser?.email) {
-      this.router.navigate(['/register-passenger']);
-    }
-
     this.bookingService.listBooking({ email: this.authService.currentUser?.email ?? '' })
       .subscribe(result => this.bookings = result, this.handleError);
   }
