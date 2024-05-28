@@ -1,3 +1,6 @@
+FlightBookingSystem
+Overview:
+
 FlightBookingSystem is a Single Page Application (SPA) designed to facilitate flight bookings. The application uses Angular for the client side and ASP.NET Core for the backend API. The project includes functionalities such as searching for flights, viewing flight details, and booking flights.
 
 Features:
