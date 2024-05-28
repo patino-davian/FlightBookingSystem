@@ -5,6 +5,7 @@ using FlightBookingSystem.Domain.Entities;
 using FlightBookingSystem.Domain.Errors;
 using FlightBookingSystem.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace FlightBookingSystem.Controllers
 {
@@ -26,9 +27,39 @@ namespace FlightBookingSystem.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [ProducesResponseType(typeof(IEnumerable<FlightRm>), 200)]
-        public IEnumerable<FlightRm> Search()
+        public IEnumerable<FlightRm> Search(
+            [FromQuery]
+            FlightSearchParameters
+            flightSearchParameters)
         {
-            var flightRmList = _entities.Flights.Select(flight => new FlightRm(
+
+            IQueryable<Flight> flights = _entities.Flights;
+
+            if (!string.IsNullOrWhiteSpace(flightSearchParameters.From))
+                flights = flights.Where(flight => flight.Departure.Place.Contains(flightSearchParameters.From));
+
+            if (!string.IsNullOrWhiteSpace(flightSearchParameters.Destination))
+                flights = flights.Where(flight => flight.Arrival.Place.Contains(flightSearchParameters.Destination));
+            
+
+            if (flightSearchParameters.FromDate != null)
+                flights = flights.Where(flight => flight.Departure.Time >= flightSearchParameters.FromDate.Value.Date);
+            
+
+            if (flightSearchParameters.ToDate != null)
+                flights = flights.Where(flight => flight.Departure.Time >= flightSearchParameters.ToDate.Value.Date.AddDays(1).AddTicks(-1));
+            
+
+            if (flightSearchParameters.NumberOfPassengers != 0 && flightSearchParameters.NumberOfPassengers != null)
+                flights = flights.Where(flight => flight.RemainingNumberOfSeats >= flightSearchParameters.NumberOfPassengers);
+            else
+            {
+                flights = flights.Where(flight => flight.RemainingNumberOfSeats >= 1);
+            }
+
+
+            var flightRmList = flights
+                .Select(flight => new FlightRm(
                 flight.Id,
                 flight.Airline,
                 flight.Price,

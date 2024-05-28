@@ -2,7 +2,9 @@ import { Time } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http'
 import { FlightService } from '../api/services/flight.service';
-import { FlightRm } from '../api/models'
+import { FlightRm } from '../api/models';
+import { FormBuilder } from '@angular/forms';
+import { SearchFlightParams } from '../../interfaces/search-flight-params'
 
 @Component({
   selector: 'app-search-flights',
@@ -13,14 +15,39 @@ export class SearchFlightsComponent implements OnInit {
 
   searchResult: FlightRm[] = [];
 
-  constructor(private flightService: FlightService) { }
+  constructor(
+    private flightService: FlightService,
+    private formBuilder: FormBuilder) { }
 
-  ngOnInit() {
+  searchForm = this.formBuilder.group({
+    from: [''],
+    destination: [''],
+    fromDate: [''],
+    toDate: [''],
+    numberOfPassengers: [1]
+  })
 
+  ngOnInit(): void {
+    this.search();
   }
 
   search() {
-    this.flightService.searchFlight({}).subscribe(request => this.searchResult = request, this.handleError)
+
+    const formValues = this.searchForm.value;
+
+    const params: SearchFlightParams = {
+      from: formValues.from || '',
+      destination: formValues.destination || '',
+      fromDate: formValues.fromDate || '',
+      toDate: formValues.toDate || '',
+      numberOfPassengers: formValues.numberOfPassengers ?? 1
+    }
+
+    this.flightService.searchFlight(params)
+      .subscribe(request => {
+        this.searchResult = request;
+      },
+    error => this.handleError)
   }
 
   private handleError(err: any) {
